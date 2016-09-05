@@ -21,7 +21,9 @@ class xlvoContextLiveVoting {
 	 * @return bool
 	 */
 	public static function supportsRedirects() {
-		return false;
+// fau: fixLiveVotingSession - allow redirects because authentication is checked (see below)
+		return true;
+// fau.
 	}
 
 
@@ -69,6 +71,8 @@ class xlvoContextLiveVoting {
 	 * @return bool
 	 */
 	public static function doAuthentication() {
-		return false;
+// fau: fixLiveVotingSession - enable authentication to get a session id with customized studon initialisation
+		return true;
+// fau.
 	}
 }
