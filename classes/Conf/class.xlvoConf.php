@@ -27,16 +27,25 @@ class xlvoConf extends ActiveRecord {
 	 */
 	public static function getShortLinkURL() {
 		if (self::getConfig(self::F_ALLOW_SHORTLINK)) {
-			$url = self::getConfig(self::F_ALLOW_SHORTLINK_LINK);
-			$url = rtrim($url, "/") . "/";
+
+// fau: linkPermaShort - adapt live voting link
+//			$url = self::getConfig(self::F_ALLOW_SHORTLINK_LINK);
+//			$url = rtrim($url, "/") . "/";
+//			$url = str_replace("http://", '', $url);
+//			$url = str_replace("https://", '', $url);
+//
+//			if (ilHTTPS::getInstance()->isDetected()) {
+//				$url = 'https://' . $url;
+//			} else {
+//				$url = 'http://' . $url;
+//			}
+
+			$url = ilLink::_getShortlinkBase();
+			$url = rtrim($url, "/") . "/vote";
 			$url = str_replace("http://", '', $url);
 			$url = str_replace("https://", '', $url);
+// fau.
 
-			if (ilHTTPS::getInstance()->isDetected()) {
-				$url = 'https://' . $url;
-			} else {
-				$url = 'http://' . $url;
-			}
 		} else {
 			$url = ILIAS_HTTP_PATH . '/Customizing/global/plugins/Services/Repository/RepositoryObject/LiveVoting/pin.php?pin=';
 		}
@@ -50,7 +59,13 @@ class xlvoConf extends ActiveRecord {
 	 */
 	public static function getBaseURL() {
 		if (self::getConfig(self::F_ALLOW_SHORTLINK)) {
-			$url = self::getConfig(self::F_BASE_URL);
+
+// fau: linkPermaShort - get base path from ini file
+			// $url = self::getConfig(self::F_BASE_URL);
+			global $ilIliasIniFile;
+			$url = $ilIliasIniFile->readVariable("server","http_path");
+// fau.
+
 			$url = rtrim($url, "/") . "/";
 		} else {
 			$str = strstr(ILIAS_HTTP_PATH, 'Customizing', true);

@@ -167,6 +167,10 @@ class xlvoInitialisation extends ilInitialisation {
 		$GLOBALS['COOKIE_PATH'] = '/';
 		self::setCookieParams();
 		self::initLog();
+
+// fau: fixLiveVotingSession - init customization
+		self::initCust();
+// fau.
 	}
 
 
