@@ -40,6 +40,7 @@ class xlvoConf extends ActiveRecord {
 //				$url = 'http://' . $url;
 //			}
 
+			require_once('Services/Link/classes/class.ilLink.php');
 			$url = ilLink::_getShortlinkBase();
 			$url = rtrim($url, "/") . "/vote";
 			$url = str_replace("http://", '', $url);
