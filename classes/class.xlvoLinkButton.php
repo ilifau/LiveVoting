@@ -1,5 +1,9 @@
 <?php
 
+// fim: [trash] avoid fatal error when live voting is deleted via command line
+require_once("Services/UIComponent/Button/classes/class.ilLinkButton.php");
+// fim.
+
 /**
  * Class xlvoLinkButton
  *
