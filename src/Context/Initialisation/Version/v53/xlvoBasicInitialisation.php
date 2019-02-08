@@ -276,7 +276,10 @@ class xlvoBasicInitialisation {
 	 * @return bool
 	 */
 	private function loadClientIniFile() {
-		$ini_file = "./" . ILIAS_WEB_DIR . "/" . CLIENT_ID . "/client.ini.php";
+// fau: customClientIni - read naming of the client.ini.php from the ilias.ini.php
+		$ini_file = $this->iliasIniFile->readVariable("clients","inifile");
+		$ini_file = "./".ILIAS_WEB_DIR."/".CLIENT_ID."/". (empty($ini_file) ? 'client.ini.php' : $ini_file);
+// fau.
 
 		// get settings from ini file
 		$ilClientIniFile = new ilIniFile($ini_file);
