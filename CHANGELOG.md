@@ -1,12 +1,21 @@
 # Change Log
-All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/)
-and this project adheres to [Semantic Versioning](http://semver.org/).
+## [4.1.1] - 2019-03-25
+- fixed bug direct links for non public LiveVotings - PLLV-314
+- fixed bug short links PLLV-313
 
-## [4.0.3] - 2018-08-
+## [4.1.0] - 2019-03-22
 
-### Added
+- allow copy LiveVoting objects
+- rebuilt communication
+- Bugfixes in PowerPoint Export
+- Bugfix when saving object settings
+- Other small bugfixes
+- Improved PowerPoint Export
+
+## [4.0.3] - 2018-08-02
+
+- Removed ILIAS 5.1 support
 - ILIAS 5.3 support
 - Feature: Presenter link included puk
 - Feature: Export PowerPoint with slides for each questions with presenter link
@@ -15,8 +24,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Feature: NumberRange step
 - Feature: FreeInput single and multiple lines answer field
 - Feature: Ask for removing data on uninstall
-
-### Changed
 - Removed discard button in FreeInput
 - Removed 'Colums for possible answers' in NumberRange
 - Fix fullscreen background not any more black
@@ -25,14 +32,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Full namespaces
 - DIC-Trait
 - CustomInputGUI's
-
-### Deprecated
-- 
-
-### Removed
-- Removed ILIAS 5.1 support
-
-### Fixed
 - Fix no preventDefault on some button which caused unwanted redirects
 - Fixed filtering by participant for anonymous participants
 - FreeInput now don't allows empty inputs anymore
@@ -43,8 +42,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fix visible permission
 - Fix Chrome's favicon.ico (If shortlink enabled)
 - Fix PegasusHelper let crash
-
-### Improved
 - Refactoring
 - Plugin uninstaller
 - Fix no wrap if the shortlink URL is too long
@@ -53,36 +50,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Updated de and en languages and remove outdated PluginTranslator
 - Screen-Id-Component
 - PHP version checker
-
-### Security
 - Improved PIN validation in pin.php
 - Improved FreeInput config validation
 
-## [Unreleased] - XXX
-### Added
+## [4.0.2] - 2018-07-11
 - Added the functionality to pin a voting to the personal workspace
-### Changed
-### Deprecated
-### Removed
-### Fixed
 - Fixed a issue which prevented the cache to work like intended in ILIAS 5.2
 - Fixed a redirect loop if the page translation is enabled.
 - Fixed plugin regression 
 - Slightly improved ILIAS 5.2 initialisation performance
 - Results filter is now working again as expected.
 - The play button is now displayed as intended on small displays (presenter view).
-### Security
 
 ## [3.5.0] - 2017-04-19
 
-### Added
 - New question type "Number Range" which allows user to choose a number within a range.
 - Changelog
-
-### Changed
 - The "Free Input" question type now groups answer duplicates together.
 - The "Correct Order" question type randomizes the items for the voting participants.
 - Added Semantic Versioning section to readme
-
-### Removed
 - Removed some leftovers of ILIAS 5.0 compatible releases.

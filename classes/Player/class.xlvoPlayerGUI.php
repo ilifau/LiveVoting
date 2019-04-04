@@ -56,11 +56,10 @@ class xlvoPlayerGUI extends xlvoGUI {
 	 *
 	 */
 	public function __construct() {
-
 		parent::__construct();
 		$param_manager = ParamManager::getInstance();
 
-		$this->manager = xlvoVotingManager2::getInstanceFromObjId(ilObject2::_lookupObjId($param_manager->getRefId()), $param_manager->getVoting());
+		$this->manager = xlvoVotingManager2::getInstanceFromObjId(ilObject2::_lookupObjId($param_manager->getRefId()));
 
 		self::dic()->mainTemplate()->addCss(self::plugin()->directory() . '/templates/default/default.css');
 	}
@@ -83,7 +82,7 @@ class xlvoPlayerGUI extends xlvoGUI {
 		try {
 			$this->manager->prepareStart();
 		} catch (xlvoPlayerException $e) {
-			ilUtil::sendFailure($this->txt('msg_no_start_' . $e->getCode()));
+			ilUtil::sendFailure($this->txt('msg_no_start_' . $e->getCode()), true);
 
 			return;
 		}
@@ -111,10 +110,13 @@ class xlvoPlayerGUI extends xlvoGUI {
 		 * @var xlvoVotingConfig $xlvoVotingConfig
 		 */
 		$xlvoVotingConfig = $this->manager->getVotingConfig();
+
 		$template->setVariable('PIN', xlvoPin::formatPin($xlvoVotingConfig->getPin()));
 
-		$template->setVariable('QR-CODE', xlvoQR::getImageDataString($xlvoVotingConfig->getShortLinkURL(true), 180));
-		$template->setVariable('SHORTLINK', $xlvoVotingConfig->getShortLinkURL());
+		$param_manager = ParamManager::getInstance();
+		$template->setVariable('QR-CODE', xlvoQR::getImageDataString($xlvoVotingConfig->getShortLinkURL(true, $param_manager->getRefId()), 180));
+
+		$template->setVariable('SHORTLINK', $xlvoVotingConfig->getShortLinkURL(false, $param_manager->getRefId()));
 		$template->setVariable('MODAL', xlvoQRModalGUI::getInstanceFromVotingConfig($xlvoVotingConfig)->getHTML());
 		$template->setVariable("ONLINE_TEXT", self::plugin()->translate("start_online", "", [ 0 ]));
 		$template->setVariable("ZOOM_TEXT", self::plugin()->translate("start_zoom"));
@@ -147,7 +149,7 @@ class xlvoPlayerGUI extends xlvoGUI {
 		$this->initToolbarDuringVoting();
 		$this->manager->prepare();
 		$this->manager->getPlayer()->setStatus(xlvoPlayer::STAT_RUNNING);
-		$this->manager->getPlayer()->unfreeze();
+		$this->manager->getPlayer()->unfreeze(trim(filter_input(INPUT_GET, ParamManager::PARAM_VOTING), "/"));
 		$modal = xlvoQRModalGUI::getInstanceFromVotingConfig($this->manager->getVotingConfig())->getHTML();
 		self::dic()->mainTemplate()->setContent($modal . $this->getPlayerHTML());
 		$this->handlePreview();
@@ -160,6 +162,12 @@ class xlvoPlayerGUI extends xlvoGUI {
 	protected function startPlayer() {
 		$this->initJSandCss();
 		$this->manager->prepare();
+
+		if ($voting_id = trim(filter_input(INPUT_GET, ParamManager::PARAM_VOTING), "/")) {
+			$this->manager->getPlayer()->setActiveVoting($voting_id);
+			$this->manager->getPlayer()->store();
+		}
+
 		$this->initToolbarDuringVoting();
 		$modal = xlvoQRModalGUI::getInstanceFromVotingConfig($this->manager->getVotingConfig())->getHTML();
 		self::dic()->mainTemplate()->setContent($modal . $this->getPlayerHTML());
@@ -172,9 +180,13 @@ class xlvoPlayerGUI extends xlvoGUI {
 	 */
 	protected function startPresenter() {
 		try {
-			xlvoPin::checkPin($this->param_manager->getPin());
+			xlvoPin::checkPinAndGetObjId($this->param_manager->getPin());
 		} catch (Throwable $e) {
-			throw new ilException("PlayerGUI startPresenter1 Wrong PIN!");
+			throw new ilException("PlayerGUI startPresenter: Wrong PIN! (1)");
+		}
+
+		if ($this->param_manager->getVoting() == 0) {
+			throw new ilException("PlayerGUI startPresenter: No Voting!");
 		}
 
 		$this->manager = new xlvoVotingManager2($this->param_manager->getPin(), $this->param_manager->getVoting());
@@ -186,7 +198,7 @@ class xlvoPlayerGUI extends xlvoGUI {
 
 		if ($xlvoVotingConfig === NULL) {
 			/* || !ilObjLiveVotingAccess::hasWriteAccess($this->manager->getObjId())*/
-			throw new ilException("PlayerGUI startPresenter2 Wrong PIN!");
+			throw new ilException("PlayerGUI startPresenter: Wrong PIN! (2)");
 		}
 
 		if ($xlvoVotingConfig->getPuk() !== $this->param_manager->getPuk()) {
@@ -207,9 +219,10 @@ class xlvoPlayerGUI extends xlvoGUI {
 	 *
 	 */
 	protected function getPlayerData() {
+
 		$this->manager->attend();
 
-		//TODO: PLLV-272
+		//Set Active Voting of Presenter via URL - bot don't save it - PLLV-272
 		if ($this->param_manager->getVoting() > 0) {
 			$this->manager->getPlayer()->setActiveVoting($this->param_manager->getVoting());
 		}
@@ -288,16 +301,16 @@ class xlvoPlayerGUI extends xlvoGUI {
 	 * @throws ilException
 	 */
 	protected function apiCall() {
-		//TODO: PLLV-272
-		if ($this->param_manager->getVoting() > 0) {
-			$this->manager->getPlayer()->setActiveVoting($this->param_manager->getVoting());
-		}
+
+		/*if ($_POST['xvi'] > 0) {
+			$this->manager->getPlayer()->setActiveVoting($_POST['xvi']);
+		}*/
 
 		$return_value = true;
 		switch ($_POST['call']) {
 			case 'toggle_freeze':
-				$this->manager->getPlayer()->setStatus(xlvoPlayer::STAT_RUNNING);
-				$this->manager->getPlayer()->toggleFreeze();
+				//$this->manager->getPlayer()->setStatus(xlvoPlayer::STAT_RUNNING);
+				$this->manager->getPlayer()->toggleFreeze(trim(filter_input(INPUT_GET, ParamManager::PARAM_VOTING), "/"));
 				break;
 			case 'toggle_results':
 				$this->manager->getPlayer()->toggleResults();
@@ -487,6 +500,8 @@ class xlvoPlayerGUI extends xlvoGUI {
 		foreach ($this->manager->getAllVotings() as $voting) {
 			$id = $voting->getId();
 			$t = $voting->getTitle();
+			self::dic()->ctrl()->setParameterByClass(xlvoPlayerGUI::class, ParamManager::PARAM_VOTING, $id);
+
 			$target = self::dic()->ctrl()->getLinkTarget(new xlvoPlayerGUI(), self::CMD_START_PLAYER);
 			if ($async) {
 				$current_selection_list->addItem($t, $id, $target, '', '', '', '', false, 'xlvoPlayer.open(' . $id . ')');
@@ -556,7 +571,10 @@ class xlvoPlayerGUI extends xlvoGUI {
 	protected function handlePreview() {
 		if ($this->manager->getVotingConfig()->isSelfVote()) {
 			$preview = self::plugin()->template('default/Player/tpl.preview.html', true, false);
-			$preview->setVariable('URL', $this->manager->getVotingConfig()->getShortLinkURL());
+
+			$param_manager = ParamManager::getInstance();
+
+			$preview->setVariable('URL', $this->manager->getVotingConfig()->getShortLinkURL(false, $param_manager->getRefId()));
 			self::dic()->mainTemplate()->setRightContent($preview->get());
 		}
 	}
