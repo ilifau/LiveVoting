@@ -1,4 +1,45 @@
 # Change Log
+
+## [5.1.5]
+- Fix: some language variables fixed/added
+
+## [5.1.4]
+- Fix: Additional RBAC Method in ilRbacReview-Mock for PIN Context - fixes compatibility problems with system notifications
+
+## [5.1.3]
+- css recompiled
+
+## [5.1.2]
+- Fix voting scroller in ILIAS 6
+- Fix presenter view is empty
+
+## [5.1.1]
+- Fix Freitextfrage
+
+## [5.1.0]
+- Pass `lang` key in `GET` to ajax voting requests
+- Remove hardcoded german language and use current
+
+## [5.0.0]
+- ILIAS 6 support
+- Remove ILIAS 5.3 support
+
+## [4.4.3]
+- Fixed complication with MathJax v3
+
+## [4.4.2]
+- Fixed typos
+
+## [4.4.1]
+- Fix may event not init before mail
+
+## [4.4.0]
+- Clone questions in an other object
+- Fix mail may not init
+
+## [4.3.4]
+- Security Fix: PLLV-361 - Fixed code injection in free text questions
+
 ## [4.3.3]
 - Fixed Bug PLLV-345 - do not present results in more than one column
 - Fixed issue with other plugins calling ilUtil::getImagePath - thx to mjansen / https://github.com/studer-raimann/LiveVoting/pull/24
